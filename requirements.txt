@@ -1,0 +1,18 @@
+# Pinned to the versions this project was built and tested with.
+# NOTE: fastapi, httpx, mlflow and dvc could not be installed where this was
+# written - if pip complains, run `pip install -r requirements.txt`, fix the
+# four pins marked (verify) to versions that resolve, then `pip freeze` them.
+pandas==2.2.3
+numpy==2.5.3
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+cloudpickle==3.1.2
+PyYAML==6.0.3
+pydantic==2.13.5
+uvicorn==0.54.0
+pytest==9.1.1
+fastapi==0.115.6   # (verify)
+httpx==0.28.1      # (verify)
+mlflow     # (verify)
+dvc==3.59.0        # (verify)

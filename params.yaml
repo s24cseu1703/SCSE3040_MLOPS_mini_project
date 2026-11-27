@@ -1,0 +1,43 @@
+# All settings live here; the code reads this file with yaml.safe_load.
+random_state: 42
+
+paths:
+  train: data/raw/train.csv
+  later: data/raw/later.csv
+  holdout: data/raw/holdout_features.csv
+  model: models/model.joblib
+  predictions: predictions/holdout_predictions.csv
+  findings: reports/findings.yaml
+
+data:
+  id_col: record_id
+  date_col: date
+  target: pm25_next_day
+  group_col: station_zone
+  numeric_features: [pm25_today, wind_kmph, humidity_pct, temp_c, traffic_index, stubble_fires]
+  categorical_features: [day_type, station_zone]
+  # Candidate values the data checks look for
+  sentinel_candidates: [-1, -999, 999, 9999, -9999]
+  unit_factor_candidates: [10, 12, 60, 100, 1000]
+  target_typo_ratio: 5      # target above 5 x median is treated as "typed 10x too big"
+  stuck_min_rows: 30        # a value repeated at least this often ...
+  stuck_dominance: 4        # ... and 4x more often than the next value is "stuck"
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: mp097-air-quality
+  registered_model_name: mp097-pm25-model
+  champion_alias: champion
+
+split:
+  val_fraction: 0.2            # last 20% of cleaned train (by date) for model selection
+  later_train_fraction: 0.7    # first 70% of later.csv goes into v2 training
+
+monitoring:
+  psi_bins: 10
+  promote_min_improvement: 0.08   # promote v2 only if MAE is >= 8% lower
+
+candidates:
+  - {name: ridge_alpha1,  kind: ridge, params: {alpha: 1.0}}
+  - {name: ridge_alpha10, kind: ridge, params: {alpha: 10.0}}
+  - {name: gbr_depth3,    kind: gbr,   params: {n_estimators: 200, learning_rate: 0.05, max_depth: 3, random_state: 42}}

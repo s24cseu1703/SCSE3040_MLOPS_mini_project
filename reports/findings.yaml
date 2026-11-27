@@ -1,0 +1,53 @@
+group_id: G142
+problem_id: MP097
+data_issues:
+  leaking_column:
+    present: false
+    column: null
+  unit_mixup:
+    present: true
+    column: pm25_today
+    group_value: Industrial
+    factor: 1000
+  sentinel_value:
+    present: true
+    column: wind_kmph
+    value: -999
+    count: 46
+  duplicate_rows:
+    present: false
+    count: null
+  stuck_sensor:
+    present: true
+    column: stubble_fires
+    start_date: '2026-04-12'
+    end_date: '2026-05-15'
+  target_typos:
+    present: true
+    count: 14
+  spelling_variants:
+    present: true
+    column: day_type
+    true_levels: 3
+tracking:
+  experiment_name: mp097-air-quality
+  best_run_id: d3d52ad864c34a1faa6dd9d43fa615d5
+  registered_model_name: mp097-pm25-model
+  champion_version: 10
+monitoring:
+  psi:
+    pm25_today: 0.0306
+    wind_kmph: 0.0331
+    humidity_pct: 0.0631
+    temp_c: 4.3635
+    traffic_index: 0.0123
+    stubble_fires: 0.0338
+  most_drifted_feature: temp_c
+  mae_by_group:
+    Central: 24.09
+    Residential: 37.53
+    Industrial: 17.922
+  worst_served_group: Residential
+  mae_v1_on_check: 27.013
+  mae_v2_on_check: 22.391
+  decision: promote

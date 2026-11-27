@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tomorrow's Air Quality · Bhopal</title>
+<style>
+  :root{
+    --bg:#f4f6f5; --card:#ffffff; --ink:#14201b; --muted:#5d6b64; --line:#dfe5e2;
+    --accent:#0f766e; --accent-ink:#ffffff; --field:#f9fbfa; --danger:#b42318;
+    --shadow:0 1px 2px rgba(16,24,20,.05),0 8px 24px rgba(16,24,20,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1512; --card:#151e1a; --ink:#e8efeb; --muted:#93a39a; --line:#26332d;
+      --accent:#2dd4bf; --accent-ink:#06201b; --field:#101814; --danger:#f97066;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1512; --card:#151e1a; --ink:#e8efeb; --muted:#93a39a; --line:#26332d;
+    --accent:#2dd4bf; --accent-ink:#06201b; --field:#101814; --danger:#f97066;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{max-width:1040px;margin:0 auto;padding:28px 16px 8px;display:flex;
+    justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;font-size:24px;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:4px 0 0}
+  .tools{display:flex;gap:8px;align-items:center;flex-shrink:0}
+  .pill{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+  .dot.ok{background:#22a06b}.dot.bad{background:var(--danger)}
+  button.ghost{font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+  main{max-width:1040px;margin:0 auto;padding:16px;display:grid;
+    grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px}
+  @media (max-width:820px){main{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:20px}
+  h2{margin:0 0 14px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+  label small{font-weight:400;color:var(--muted)}
+  input[type=number]{width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--line);
+    background:var(--field);color:var(--ink);font:inherit}
+  input[type=number]:focus{outline:2px solid var(--accent);outline-offset:1px}
+  input.err{border-color:var(--danger)}
+  .msg{color:var(--danger);font-size:12px;min-height:16px;margin-top:3px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--field)}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label{flex:1;margin:0;text-align:center;padding:8px 6px;font-weight:500;font-size:13px;
+    cursor:pointer;color:var(--muted);border-right:1px solid var(--line)}
+  .seg label:last-of-type{border-right:0}
+  .seg input:checked+label{background:var(--accent);color:var(--accent-ink);font-weight:600}
+  .seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+  .full{grid-column:1/-1}
+  .actions{display:flex;gap:10px;margin-top:18px}
+  button.primary{flex:1;font:inherit;font-weight:600;padding:11px 16px;border:0;border-radius:10px;
+    background:var(--accent);color:var(--accent-ink);cursor:pointer}
+  button.primary:disabled{opacity:.6;cursor:wait}
+  button.secondary{font:inherit;padding:11px 16px;border-radius:10px;border:1px solid var(--line);
+    background:transparent;color:var(--ink);cursor:pointer}
+  .result{display:flex;flex-direction:column;gap:14px}
+  .empty{color:var(--muted);padding:28px 4px;text-align:center}
+  .value{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1}
+  .unit{color:var(--muted);font-size:14px;margin-left:6px;font-weight:500}
+  .badge{display:inline-block;padding:5px 12px;border-radius:999px;font-weight:600;font-size:13px;color:#fff}
+  .advice{margin:0;color:var(--ink)}
+  .scale{display:flex;height:10px;border-radius:6px;overflow:hidden;position:relative;margin-top:6px}
+  .scale span{flex:1}
+  .marker{position:absolute;top:-4px;width:3px;height:18px;background:var(--ink);border-radius:2px;
+    transform:translateX(-50%);transition:left .4s}
+  .legend{position:relative;height:16px;font-size:11px;color:var(--muted);margin-top:6px}
+  .legend span{position:absolute;transform:translateX(-50%)}
+  .legend span:first-child{transform:none}
+  .legend span:last-child{transform:translateX(-100%)}
+  .meta{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+  .error{color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent);
+    border:1px solid color-mix(in srgb,var(--danger) 35%,transparent);border-radius:10px;padding:10px 12px;font-size:13px}
+  footer{max-width:1040px;margin:0 auto;padding:8px 16px 32px;color:var(--muted);font-size:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Tomorrow's Air Quality · Bhopal</h1>
+    <p class="sub">Next-day PM2.5 forecast for schools and hospitals · Bhopal Clean Air Cell</p>
+  </div>
+  <div class="tools">
+    <span class="pill"><span class="dot" id="dot"></span><span id="status">checking…</span></span>
+    <button class="ghost" id="theme" type="button" aria-label="Toggle theme">Theme</button>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Today's conditions</h2>
+    <form id="form" novalidate>
+      <div class="grid">
+        <div class="full">
+          <label>Station zone</label>
+          <div class="seg" role="radiogroup" aria-label="Station zone">
+            <input type="radio" name="station_zone" id="z1" value="Central" checked><label for="z1">Central</label>
+            <input type="radio" name="station_zone" id="z2" value="Residential"><label for="z2">Residential</label>
+            <input type="radio" name="station_zone" id="z3" value="Industrial"><label for="z3">Industrial</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>Day type</label>
+          <div class="seg" role="radiogroup" aria-label="Day type">
+            <input type="radio" name="day_type" id="d1" value="weekday" checked><label for="d1">Weekday</label>
+            <input type="radio" name="day_type" id="d2" value="weekend"><label for="d2">Weekend</label>
+            <input type="radio" name="day_type" id="d3" value="festival"><label for="d3">Festival</label>
+          </div>
+        </div>
+        <div><label for="pm25_today">PM2.5 today <small>µg/m³</small></label>
+          <input type="number" id="pm25_today" step="any" value="150"><div class="msg"></div></div>
+        <div><label for="temp_c">Temperature <small>°C, max 75</small></label>
+          <input type="number" id="temp_c" step="any" value="30" max="75"><div class="msg"></div></div>
+        <div><label for="wind_kmph">Wind speed <small>km/h, min 0</small></label>
+          <input type="number" id="wind_kmph" step="any" value="12" min="0"><div class="msg"></div></div>
+        <div><label for="humidity_pct">Humidity <small>%</small></label>
+          <input type="number" id="humidity_pct" step="any" value="55"><div class="msg"></div></div>
+        <div><label for="traffic_index">Traffic index</label>
+          <input type="number" id="traffic_index" step="any" value="60"><div class="msg"></div></div>
+        <div><label for="stubble_fires">Stubble fires <small>count</small></label>
+          <input type="number" id="stubble_fires" step="any" value="120"><div class="msg"></div></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="go" type="submit">Predict tomorrow's PM2.5</button>
+        <button class="secondary" id="reset" type="button">Reset</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card result" aria-live="polite">
+    <h2>Forecast</h2>
+    <div id="out"><div class="empty">Enter today's readings and press <b>Predict</b>.</div></div>
+  </section>
+</main>
+
+<footer>
+  Categories follow India's National AQI bands for PM2.5. ·
+  <a href="/docs">API docs</a> · Group G142 · MP097
+</footer>
+
+<script>
+const BANDS = [
+  {max:30,  name:"Good",              color:"#2e9e5b", advice:"Air quality is good. Normal outdoor activity is fine."},
+  {max:60,  name:"Satisfactory",      color:"#7cae2a", advice:"Acceptable. Unusually sensitive people may notice minor effects."},
+  {max:90,  name:"Moderately polluted", color:"#c9a100", advice:"People with lung or heart conditions should limit long outdoor exertion."},
+  {max:120, name:"Poor",              color:"#e07a1f", advice:"Sensitive groups should avoid outdoor exertion. Consider limiting outdoor school activities."},
+  {max:250, name:"Very poor",         color:"#d03a2f", advice:"Everyone should reduce outdoor exertion. Schools and hospitals should plan for indoor activity."},
+  {max:Infinity, name:"Severe",       color:"#8c1d40", advice:"Health emergency conditions. Avoid outdoor activity and keep vulnerable people indoors."}
+];
+const SCALE_MAX = 300;
+const $ = id => document.getElementById(id);
+const NUM = ["pm25_today","wind_kmph","humidity_pct","temp_c","traffic_index","stubble_fires"];
+const DEFAULTS = {pm25_today:150,wind_kmph:12,humidity_pct:55,temp_c:30,traffic_index:60,stubble_fires:120};
+
+// theme
+function setTheme(t){ try{ localStorage.setItem("theme",t) }catch(e){}; document.documentElement.dataset.theme=t }
+try{ const t=localStorage.getItem("theme"); if(t) document.documentElement.dataset.theme=t }catch(e){}
+$("theme").onclick = () => {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==="dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(dark ? "light" : "dark");
+};
+
+// health
+fetch("/health").then(r=>r.json()).then(j=>{
+  $("dot").className="dot ok"; $("status").textContent="API online";
+}).catch(()=>{ $("dot").className="dot bad"; $("status").textContent="API offline"; });
+
+function validate(){
+  let ok=true;
+  NUM.forEach(id=>{
+    const el=$(id), msg=el.parentElement.querySelector(".msg"); const v=el.value.trim();
+    let m="";
+    if(v===""||isNaN(Number(v))) m="Enter a number";
+    else if(id==="wind_kmph" && Number(v)<0) m="Wind speed cannot be negative";
+    else if(id==="temp_c" && Number(v)>75) m="Temperature cannot exceed 75 °C";
+    el.classList.toggle("err",!!m); msg.textContent=m; if(m) ok=false;
+  });
+  return ok;
+}
+
+function band(v){ return BANDS.find(b=>v<=b.max) }
+
+function render(v, ms){
+  const b=band(v), pos=Math.min(v/SCALE_MAX,1)*100;
+  const segs=BANDS.map(x=>`<span style="background:${x.color};flex:${(Math.min(x.max,SCALE_MAX)-(BANDS[BANDS.indexOf(x)-1]?.max??0))}"></span>`).join("");
+  $("out").innerHTML=`
+    <div class="result">
+      <div><span class="value">${v.toFixed(1)}</span><span class="unit">µg/m³ PM2.5</span></div>
+      <div><span class="badge" style="background:${b.color}">${b.name}</span></div>
+      <p class="advice">${b.advice}</p>
+      <div>
+        <div class="scale">${segs}<div class="marker" style="left:${pos}%"></div></div>
+        <div class="legend"><span style="left:0">0</span><span style="left:20%">60</span><span style="left:40%">120</span><span style="left:83.3%">250</span><span style="left:100%">300+</span></div>
+      </div>
+      <div class="meta">Predicted PM2.5 for tomorrow · model response in ${ms} ms</div>
+    </div>`;
+}
+
+function showError(text){ $("out").innerHTML=`<div class="error">${text}</div>` }
+
+$("form").addEventListener("submit", async e=>{
+  e.preventDefault();
+  if(!validate()) return;
+  const body={
+    station_zone:document.querySelector('[name=station_zone]:checked').value,
+    day_type:document.querySelector('[name=day_type]:checked').value
+  };
+  NUM.forEach(id=>body[id]=Number($(id).value));
+  $("go").disabled=true; $("go").textContent="Predicting…";
+  const t0=performance.now();
+  try{
+    const r=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok) render(j.prediction, Math.round(performance.now()-t0));
+    else if(r.status===422) showError("The service rejected these values: "+(j.detail||[]).map(d=>`${(d.loc||[]).slice(-1)[0]} – ${d.msg}`).join("; "));
+    else if(r.status===503) showError("The model is not available right now. Please try again shortly.");
+    else showError("Unexpected error ("+r.status+").");
+  }catch(err){ showError("Could not reach the prediction service.") }
+  finally{ $("go").disabled=false; $("go").textContent="Predict tomorrow's PM2.5" }
+});
+
+$("reset").onclick=()=>{
+  NUM.forEach(id=>{$(id).value=DEFAULTS[id];$(id).classList.remove("err");$(id).parentElement.querySelector(".msg").textContent=""});
+  $("z1").checked=true; $("d1").checked=true;
+  $("out").innerHTML='<div class="empty">Enter today\'s readings and press <b>Predict</b>.</div>';
+};
+</script>
+</body>
+</html>

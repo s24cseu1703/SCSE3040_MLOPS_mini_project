@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+mlruns/
+mlartifacts/
+# the CSVs are tracked by DVC (dvc add writes data/raw/.gitignore entries too)
+/data/raw/train.csv
+/data/raw/later.csv
